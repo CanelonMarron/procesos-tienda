@@ -1,7 +1,9 @@
 package com.procesos.tienda.service;
 
+import com.procesos.tienda.exception.NotFoundException;
 import com.procesos.tienda.model.User;
 import com.procesos.tienda.repository.UserRepository;
+import com.procesos.tienda.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,37 +15,48 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User createUser(User userReg){
-        return userRepository.save(userReg);
+    //Metodo para insertar
+    public User createUser(User userReq){
+        return userRepository.save(userReq);
     }
 
     public User getUserById(Long id){
-        return userRepository.findById(id).get();
-    }
-
-    public User updateUser(User userReq, Long id){
-        Optional<User> userBd = userRepository.findById(id);
-        if(userBd.isEmpty()){
-            return null;
+        if(id == null){
+            throw new NotFoundException("User is null");
         }
-        userBd.get().setFirstName(userReq.getFirstName());
-        userBd.get().setLastName(userReq.getLastName());
-        userBd.get().setAddress(userReq.getAddress());
-        userBd.get().setPhone(userReq.getPhone());
-        return userRepository.save(userBd.get());
-    }
-
-    public boolean deleteUser(Long id){
-        Optional<User> userBd = userRepository.findById(id);
-        if(userBd.isEmpty()){
-            return false;
+        Optional<User> user = userRepository.findById(id);
+        if(user.isEmpty()){
+            throw  new NotFoundException(Constants.USER_NOT_FOUND.getMessage());
         }
-        userRepository.delete(userBd.get());
-        return true;
+        return user.get();
     }
 
     public List<User> findAllUsers(){
         return (List<User>) userRepository.findAll();
+    }
+
+    //Metodo para actializar un usuario
+    public User updateUser(User userReq, Long id){
+        Optional<User> userBd = userRepository.findById(id);
+        if(userBd.isEmpty())
+            if(userBd.isEmpty()){
+                throw  new NotFoundException(Constants.USER_NOT_FOUND.getMessage());
+            };
+        userBd.get().setFirstName(userReq.getFirstName());
+        userBd.get().setLastName(userReq.getLastName());
+        userBd.get().setPhone(userReq.getPhone());
+        return userRepository.save(userBd.get());
+    }
+
+    //Metodo para eliminar de una base de datos
+    public boolean deleteUser(Long id){
+        Optional<User> userBd = userRepository.findById(id);
+        if(userBd.isEmpty())
+            if(userBd.isEmpty()){
+                throw  new NotFoundException(Constants.USER_NOT_FOUND.getMessage());
+            };
+        userRepository.deleteById(userBd.get().getId());
+        return true;
     }
 
 }
