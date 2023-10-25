@@ -22,7 +22,7 @@ public class UserService {
 
     public User getUserById(Long id){
         if(id == null){
-            throw new NotFoundException("User is null");
+            throw new NotFoundException(Constants.USER_IS_NULL.getMessage());
         }
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()){
